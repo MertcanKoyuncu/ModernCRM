@@ -1,0 +1,113 @@
+<Page x:Class="ModernCRM.Views.TransactionsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ModernCRM.Views"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="TransactionsPage">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Üst Araç Çubuğu -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Arama Kutusu -->
+            <Grid Grid.Column="0" Width="300" HorizontalAlignment="Left">
+                <TextBox materialDesign:HintAssist.Hint="İşlem ara..."
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Return" Command="{Binding SearchCommand}" CommandParameter="{Binding Text, RelativeSource={RelativeSource AncestorType=TextBox}}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
+                <materialDesign:PackIcon Kind="Magnify" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            </Grid>
+
+            <!-- Yeni Gelir Butonu -->
+            <Button Grid.Column="1" Style="{StaticResource MaterialDesignRaisedButton}" 
+                    Command="{Binding AddIncomeCommand}" Margin="0,0,10,0" Background="#4CAF50">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="CashPlus" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="Yeni Gelir"/>
+                </StackPanel>
+            </Button>
+
+            <!-- Yeni Gider Butonu -->
+            <Button Grid.Column="2" Style="{StaticResource MaterialDesignRaisedButton}" 
+                    Command="{Binding AddExpenseCommand}" Background="#F44336">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="CashMinus" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="Yeni Gider"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- İşlem Listesi -->
+        <materialDesign:Card Grid.Row="1" UniformCornerRadius="8">
+            <DataGrid ItemsSource="{Binding Transactions}" AutoGenerateColumns="False" 
+                      IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False" 
+                      CanUserReorderColumns="False" CanUserResizeRows="False" 
+                      CanUserSortColumns="True" HeadersVisibility="Column"
+                      Margin="16" BorderThickness="1" BorderBrush="{DynamicResource MaterialDesignDivider}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Tarih" Binding="{Binding Date, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
+                    <DataGridTemplateColumn Header="Tür" Width="80">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="{Binding Type, Converter={StaticResource TransactionTypeToIconConverter}}" 
+                                                             Foreground="{Binding Type, Converter={StaticResource TransactionTypeToColorConverter}}"
+                                                             VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <TextBlock Text="{Binding Type, Converter={StaticResource TransactionTypeToTextConverter}}" 
+                                               Foreground="{Binding Type, Converter={StaticResource TransactionTypeToColorConverter}}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Açıklama" Binding="{Binding Description}" Width="*"/>
+                    <DataGridTextColumn Header="Kategori" Binding="{Binding Category}" Width="120"/>
+                    <DataGridTextColumn Header="Ödeme Yöntemi" Binding="{Binding PaymentMethod}" Width="120"/>
+                    <DataGridTextColumn Header="Müşteri" Binding="{Binding Customer.Name}" Width="150"/>
+                    <DataGridTemplateColumn Header="Tutar" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Amount, StringFormat={}{0:N2} ₺}" 
+                                           Foreground="{Binding Type, Converter={StaticResource TransactionTypeToColorConverter}}"
+                                           HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="İşlemler" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Düzenle"
+                                            Command="{Binding DataContext.EditTransactionCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}">
+                                        <materialDesign:PackIcon Kind="Pencil" />
+                                    </Button>
+                                    <Button Style="{StaticResource MaterialDesignIconButton}" ToolTip="Sil"
+                                            Command="{Binding DataContext.DeleteTransactionCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}">
+                                        <materialDesign:PackIcon Kind="Delete" />
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </materialDesign:Card>
+    </Grid>
+</Page> 
